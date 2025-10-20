@@ -1,0 +1,204 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="app.js" defer type="module"></script>
+        <link rel="manifest" href="./manifest.json">
+        <link rel="stylesheet" href="./style/style.css">
+        <title>Echo Link</title>
+    </head>
+    <body>
+        <div id="root">
+
+            <div id="app">
+
+                <aside class="left-side-bar">
+
+                    <div class="left-side-bar-head">
+                        <input autocomplete="off" type="search" id="search" placeholder="search" aria-label="Chat-search">
+
+                        <div class="left-side-bar-nav">
+                            <button class="left-side-bar-nav-btn" id="chat_btn"> <img src="./assets/icons/message-square-dot.svg" alt=""> </button>
+                            <button class="left-side-bar-nav-btn active"  id="groups_btn"> <img src="./assets/icons/users.svg" alt=""> </button>
+                            <button class="left-side-bar-nav-btn" id="calls_btn"> <img src="./assets/icons/phone.svg" alt=""> </button>
+                        </div>
+                    </div>
+
+                    <div class="left-side-bar-chats">
+                        <div class="left-side-bar-chat" id="chat-1">
+                            <img src="./assets/icons/logo.png" width="50px" alt="">
+                            <div class="chat-name">Eyecode team</div>
+                        </div>
+                    </div>
+
+                    <div class="left-side-bar-account">
+                        <div class="left-side-bar-account-avatar"> <img width="50px" src="./assets/avatars/avatar-1.png" alt=""> </div>
+                        <div class="left-side-bar-account-name">Dvlper111</div>
+                    </div>
+                    
+                </aside>
+
+                <aside class="mobile-side-bar">
+                    <button id="mobile-menu-btn">
+                        <img src="./assets/icons/command.svg" alt="mobile-switch-btn">
+                    </button>
+                </aside>
+
+
+                <div class="chat">
+                    <div id="messages" class="chat-display">
+                        <ul id="messages"></ul>
+                    </div>
+
+
+                    <div class="chat-area">
+                        <div class="mic-wrapper">
+                            <button id="send-mic">
+                                <img src="./assets/icons/mic.svg" alt="">
+                            </button>
+                        </div>
+
+                        <div class="chat-area-wrapper">
+
+                            <div id="chat-area-input">
+                            <button> <img src="./assets/icons/smile.svg" alt=""> </button>
+                            
+                            <form id="form" action="">
+                                <input autocomplete="off" id="msg-input" type="text" placeholder="Type a message">
+                            </form>
+
+                            <button>
+                                <img src="./assets/icons/folder.svg" alt="">
+                                <input type="file" id="file" hidden>
+                            </button>
+                            </div>
+
+                            <div id="audio-msg">
+                            <img src="./assets/icons/mic.svg" alt="">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings">
+                    <h2>Settings</h2>
+
+                    <case class="sets-list">
+                        <div id="list_themes"> Themes > </div>
+                    </case>
+
+                    <case class="sets-case">
+                        <div class="case_themes">
+                            <div onclick="changeCSS('./style/style.css')"
+                            id="theme_default"> Default theme </div>
+
+                            <div onclick="changeCSS('./style/bluetheme.css')"
+                            id="theme_blue"> Modern theme </div>
+                        </div>
+                    </case>
+                </div>
+
+
+                <aside class="right-side-bar">
+                    
+                    <div class="right-side-bar-settings">
+                        <button id="settings_btn">
+                            <img src="./assets/icons/gear.svg" alt="">
+                        </button>
+                    </div>
+
+                </aside>
+            </div>
+
+        </div>
+
+        <script>
+            const socket = io();
+            const username = prompt('Enter your username');
+            let mediaRecorder;
+            let audioChunks = [];
+            
+            const form = document.getElementById('form');
+            const input = document.getElementById('msg-input');
+            const messages = document.getElementById('messages');
+            const sendMic = document.getElementById('send-mic');
+            const audioMsg = document.getElementById('audio-msg');
+            const micWrapper = document.querySelector('.mic-wrapper');
+            
+            socket.emit('set username', username);
+
+            //DOM Events
+            
+            audioMsg.addEventListener('click', async () => {
+                try{
+                    micWrapper.classList.toggle('active');
+
+                    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    mediaRecorder.ondataavailable = (e) => {
+                        audioChunks.push(e.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, {type: 'audio/webm'});
+                        audioChunks = [];
+                        socket.emit('voice message', audioBlob);
+                        const audioURL = URL.createObjectURL(audioBlob);
+                        const audio = document.createElement('audio');
+                        audio.src = audioURL;
+                        audio.controls = true;
+                        messages.appendChild(audio);
+                    };
+
+                    mediaRecorder.start(); 
+                }catch(err){
+                    console.error(err);
+                }
+            });
+
+            sendMic.addEventListener('click', () => {
+                micWrapper.classList.toggle('active');
+                mediaRecorder.stop();
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault(); //Turning off the page reloading
+                if(input.value){
+                    socket.emit('chat message', input.value);
+                    console.log(input.value);
+                    input.value = '';
+                }
+            });
+            
+            //Socket
+
+            socket.on('chat message', (msg) => {
+                const item = document.createElement('li');
+                item.textContent = `${ msg.user } : ${msg.message}`;
+                messages.appendChild(item);
+            });
+
+            //Change CSS
+
+            function changeCSS(filename){
+                const mainLink = document.getElementById('main-css');
+                if (mainLink) {
+                    mainLink.href = filename;
+                } else {
+                    // Если тега нет, создаём его
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.id = 'main-css';
+                    link.href = filename;
+                    document.head.appendChild(link);
+                }
+            }
+
+
+        </script>
+    </body>
+    </html>
