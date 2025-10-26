@@ -25,7 +25,7 @@
         socket.on('set username', (username) => {
             nickname = username || "Anonymous";
             console.log('🟣 Nickname has been set :', nickname);
-        })
+        });
 
         socket.on('disconnect', () => {
             console.log(
