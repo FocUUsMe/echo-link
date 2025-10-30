@@ -89,6 +89,9 @@
                 height: 40px;
                 text-align: center;
                 align-items: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 border-radius: 10px;
                 overflow: hidden;
                 background: linear-gradient(120deg, rgba(255, 255, 255, 0.5), black);
@@ -135,11 +138,17 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        gap: 15px;
         border-radius: 50px;
         background: linear-gradient(120deg, var(--bg-color), rgba(43, 43, 43, 0.5));
         color: white;
         padding: 10px;
         margin-top: auto;
+        
+            & img{
+                width: 40px;
+                height: 40px;
+            }
     }
 
     .mobile-side-bar{
@@ -211,6 +220,9 @@
         height: 85%;
         padding: 20px;
         overflow-y: scroll;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .chat-display::-webkit-scrollbar-track{
@@ -425,12 +437,23 @@
     /*Media*/
 
     @media only screen and (max-width: 750px){        
+        #app{
+            width: 100vw;
+            height: 100svh;
+            border-radius: 0px;
+        }
+        
         .right-side-bar, .left-side-bar{
             display: none;
         }
 
         .chat{
             width: 100%;
+        }
+
+        .chat-area{
+            position: fixed;
+            left: calc(50% - 50%);
         }
 
         .mobile-side-bar{

@@ -22,6 +22,12 @@
             io.emit('chat message', fullMessage);
         });
 
+        socket.on('voice message', (voiceData) => {
+            const voiceMessage = { user: nickname, voice: voiceData };
+            console.log(`${nickname} отправил голосовое сообщение.`);
+            io.emit('voice message', voiceMessage);
+        });
+
         socket.on('set username', (username) => {
             nickname = username || "Anonymous";
             console.log('🟣 Nickname has been set :', nickname);

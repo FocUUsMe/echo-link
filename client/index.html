@@ -130,6 +130,25 @@
             
             socket.emit('set username', username);
 
+            //Socket events
+
+             socket.on('chat message', (msg) => {
+                const item = document.createElement('li');
+                item.textContent = `${ msg.user } : ${msg.message}`;
+                messages.appendChild(item);
+            });
+
+            socket.on('voice message', (voiceMessage) =>{
+                const { user,voice} = voiceMessage;
+                console.log(voice,user)
+                const audioBlob = new Blob([voice], {type: 'audio/webm'});
+                const audioURL = URL.createObjectURL(audioBlob);
+                const audio = document.createElement('audio');
+                audio.src = audioURL;
+                audio.controls = true;
+                messages.appendChild(audio);
+            });
+
             //DOM Events
             
             audioMsg.addEventListener('click', async () => {
@@ -148,10 +167,6 @@
                         audioChunks = [];
                         socket.emit('voice message', audioBlob);
                         const audioURL = URL.createObjectURL(audioBlob);
-                        const audio = document.createElement('audio');
-                        audio.src = audioURL;
-                        audio.controls = true;
-                        messages.appendChild(audio);
                     };
 
                     mediaRecorder.start(); 
@@ -172,14 +187,6 @@
                     console.log(input.value);
                     input.value = '';
                 }
-            });
-            
-            //Socket
-
-            socket.on('chat message', (msg) => {
-                const item = document.createElement('li');
-                item.textContent = `${ msg.user } : ${msg.message}`;
-                messages.appendChild(item);
             });
 
             //Change CSS
