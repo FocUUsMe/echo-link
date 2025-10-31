@@ -35,7 +35,7 @@
 
                     <div class="left-side-bar-account">
                         <div class="left-side-bar-account-avatar"> <img width="50px" src="./assets/icons/circle-user.svg" alt=""> </div>
-                        <div class="left-side-bar-account-name">Dvlper111</div>
+                        <div class="left-side-bar-account-name"></div>
                     </div>
                     
                 </aside>
@@ -45,7 +45,6 @@
                         <img src="./assets/icons/command.svg" alt="mobile-switch-btn">
                     </button>
                 </aside>
-
 
                 <div class="chat">
                     <div id="messages" class="chat-display">
@@ -101,7 +100,6 @@
                     </case>
                 </div>
 
-
                 <aside class="right-side-bar">
                     
                     <div class="right-side-bar-settings">
@@ -128,6 +126,9 @@
             const audioMsg = document.getElementById('audio-msg');
             const micWrapper = document.querySelector('.mic-wrapper');
             
+            const accountName = document.querySelector('.left-side-bar-account-name');
+            accountName.innerHTML = username || "Anonymous";
+
             socket.emit('set username', username);
 
             //Socket events

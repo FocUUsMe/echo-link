@@ -32,3 +32,37 @@
         settingsCase.style.display = 'flex';
         themesCase.style.display = 'flex';
     });
+
+
+
+    //Mobile section
+
+    const mobileSideBar = document.querySelector('.mobile-side-bar');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const leftSideBar = document.querySelector('.left-side-bar');
+    const rightSideBar = document.querySelector('.right-side-bar');
+
+    function openMobileChats(){
+        mobileMenuBtn.style.display = 'none';
+        mobileSideBar.style.display = 'none';
+        chat.style.display = 'none';
+        leftSideBar.style.display = 'flex';
+        leftSideBar.style.width = 100 + '%';
+    }
+
+    function closeMobileChats(){
+        mobileMenuBtn.style.display = 'block';
+        mobileSideBar.style.display = 'flex';
+        chat.style.display = 'block';
+        leftSideBar.style.display = 'none';
+        leftSideBar.style.width = 250 + 'px';
+    }
+
+    mobileMenuBtn.addEventListener('click', openMobileChats);
+    
+    chatBtn.addEventListener('click', () => {
+        openChat();
+            if (window.innerWidth <= 768) { // условие для мобильного экрана, можно подкорректировать
+            closeMobileChats();
+        }
+    });
